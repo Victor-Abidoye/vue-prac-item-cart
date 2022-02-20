@@ -41,7 +41,9 @@
 
         <div class="recommended">
 
-          <div class="card">
+          <Cards v-for="(item, index) in inventory.splice(0, 3)" :key="inventory.id" :item="item" />
+
+          <!-- <div class="card">
             <div class="card-title">
               Carrots
             </div>
@@ -153,7 +155,7 @@
             <div class="card-footer">
               <button class="btn btn-light">Add to cart</button>
             </div>
-          </div>
+          </div> -->
 
         </div>
 
@@ -168,10 +170,11 @@
     <script src="https://unpkg.com/vue@3"></script>
     <script>
       let app = Vue.createApp({
-        components: ['cart'],
+        components: ['cart', 'Cards'],
         data() {
           return {
             showCart: false,
+            inventory: []
           }
         },
         methods: {
@@ -179,6 +182,11 @@
             this.showCart = !this.showCart
             console.log(this.showCart)
           }
+        },
+        async mounted() {
+          const res = await fetch('./food.json')
+          const data = await res.json()
+          this.inventory = data
         },
       })
 
@@ -243,6 +251,49 @@
       </aside>
         `,
 
+      })
+
+      app.component('Cards', {
+        props: ['item'],
+        template: `
+          <div class="card">
+            <div class="card-title">
+              {{item.name}}
+            </div>
+            <div class="card-body">
+              <i class="icofont-10x icofont-carrot"></i>
+              <form>
+                <div class="row">
+                  <div class="cell">
+                    <label>Type:</label>
+                  </div>
+                  <div class="cell">
+                    <em>{{item.type}}</em>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="cell">
+                    <label>Price:</label>
+                  </div>
+                  <div class="cell">
+                    \${{item.price.USD}}
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="cell">
+                    <label>Quantity:</label>
+                  </div>
+                  <div class="cell">
+                    <input type="number" value="0">
+                  </div>
+                </div>
+              </form>
+            </div>
+            <div class="card-footer">
+              <button class="btn btn-light">Add to cart</button>
+            </div>
+          </div>
+        `
       })
 
       app.mount('#app')

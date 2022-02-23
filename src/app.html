@@ -27,7 +27,7 @@
         </nav>
         <a href="#" class="top-bar-cart-link" @click="toggleShowCart">
           <i class="icofont-cart-alt icofont-1x"></i>
-          <span>Cart ({{cartNo()}}) </span>
+          <span>Cart ({{cartNo}}) </span>
         </a>
       </header>
 
@@ -46,7 +46,7 @@
         </div>
 
       </main>
-      <Cart v-show="showCart" :toggle="toggleShowCart" :cart="cart" :inventory="inventory" />
+      <Cart v-show="showCart" :toggle="toggleShowCart" :cart="cart" :inventory="inventory" :remove="removeItem" />
 
       <footer>
       </footer>
@@ -73,13 +73,17 @@
             this.cart[item] += quantity
             console.log(this.cart)
           },
+          removeItem(item){
+            delete this.cart[item]
+          }
+        },
+        computed: {
           cartNo () {
             const total = Object.values(this.cart).reduce((pre, curr) => {
               return pre + curr
             }, 0)
             return total
-          }
-
+          },
         },
         async mounted () {
           const res = await fetch('./food.json')
@@ -90,7 +94,7 @@
       })
 
       app.component('Cart', {
-        props: ['toggle', 'cart', 'inventory'],
+        props: ['toggle', 'cart', 'inventory', 'remove'],
         methods: {
           getPrice (item) {
             let found = this.inventory.find((grocery) => {
@@ -100,7 +104,6 @@
           },
           calculateTotal () {
             const total = Object.entries(this.cart).reduce((pre, curr) => {
-              console.log(curr)
               return pre + (curr[1] * this.getPrice(curr[0]))
             }, 0)
             return total
@@ -138,7 +141,7 @@
                   <td class="center">{{item}}</td>
                   <td>{{getPrice(key)}}</td>
                   <td class="center">
-                    <button class="btn btn-light cart-remove">
+                    <button class="btn btn-light cart-remove" @click="remove(key)">
                       &times;
                     </button>
                   </td>
